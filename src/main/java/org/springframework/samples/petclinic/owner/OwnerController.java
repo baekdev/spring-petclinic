@@ -45,8 +45,8 @@ class OwnerController {
 
 	private VisitRepository visits;
 
-	public OwnerController(OwnerRepository clinicService, VisitRepository visits) {
-		this.owners = clinicService;
+	public OwnerController(OwnerRepository owners, VisitRepository visits) {
+		this.owners = owners;
 		this.visits = visits;
 	}
 
