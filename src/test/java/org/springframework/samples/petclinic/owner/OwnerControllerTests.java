@@ -16,11 +16,6 @@
 
 package org.springframework.samples.petclinic.owner;
 
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.assertj.core.util.Lists;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -34,16 +29,16 @@ import org.springframework.samples.petclinic.visit.Visit;
 import org.springframework.samples.petclinic.visit.VisitRepository;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import static org.hamcrest.Matchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Test class for {@link OwnerController}
@@ -85,6 +80,7 @@ class OwnerControllerTests {
 		george.setAddress("110 W. Liberty St.");
 		george.setCity("Madison");
 		george.setTelephone("6085551023");
+        george.setAge(23);
 		Pet max = new Pet();
 		PetType dog = new PetType();
 		dog.setName("dog");
@@ -130,24 +126,24 @@ class OwnerControllerTests {
 
 	@Test
 	void testProcessFindFormSuccess() throws Exception {
-		given(this.owners.findByLastName("")).willReturn(Lists.newArrayList(george, new Owner()));
+		given(this.owners.findByFirstName("")).willReturn(Lists.newArrayList(george, new Owner()));
 		mockMvc.perform(get("/owners")).andExpect(status().isOk()).andExpect(view().name("owners/ownersList"));
 	}
 
-	@Test
-	void testProcessFindFormByLastName() throws Exception {
-		given(this.owners.findByLastName(george.getLastName())).willReturn(Lists.newArrayList(george));
-		mockMvc.perform(get("/owners").param("lastName", "Franklin")).andExpect(status().is3xxRedirection())
-				.andExpect(view().name("redirect:/owners/" + TEST_OWNER_ID));
-	}
+    @Test
+    void testProcessFindFormByFirstName() throws Exception {
+        given(this.owners.findByFirstName(george.getFirstName())).willReturn(Lists.newArrayList(george));
+        mockMvc.perform(get("/owners").param("firstName", "George")).andExpect(status().is3xxRedirection())
+            .andExpect(view().name("redirect:/owners/" + TEST_OWNER_ID));
+    }
 
-	@Test
-	void testProcessFindFormNoOwnersFound() throws Exception {
-		mockMvc.perform(get("/owners").param("lastName", "Unknown Surname")).andExpect(status().isOk())
-				.andExpect(model().attributeHasFieldErrors("owner", "lastName"))
-				.andExpect(model().attributeHasFieldErrorCode("owner", "lastName", "notFound"))
-				.andExpect(view().name("owners/findOwners"));
-	}
+    @Test
+    void testProcessFindFormNoOwnersFound() throws Exception {
+        mockMvc.perform(get("/owners").param("firstName", "Unknown Surname")).andExpect(status().isOk())
+            .andExpect(model().attributeHasFieldErrors("owner", "firstName"))
+            .andExpect(model().attributeHasFieldErrorCode("owner", "firstName", "notFound"))
+            .andExpect(view().name("owners/findOwners"));
+    }
 
 	@Test
 	void testInitUpdateOwnerForm() throws Exception {
